@@ -5,28 +5,27 @@ import lndImage from "./assets/lnd.png";
 import albyImage from "./assets/alby.png";
 import { getTransactionId, hexToBase64 } from "./utils";
 
-const MIN_BALANCE = 500_000;
 const RECOMMENDED_NODES: RecommendedChannel[] = [
   {
     title: "ACINQ",
     pubkey:
       "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
     host: "3.33.236.230:9735",
-    min: 500000,
+    min: 550000,
   },
   {
     title: "deezy prime ⚡ ✨",
     pubkey:
       "0214ec5397050f7eec8e574d1d6feaa0c992169ed107056e6bd57aed1e94714851",
     host: "54.159.16.197:9735",
-    min: 500000,
+    min: 550000,
   },
   {
     title: "bitfinex.com",
     pubkey:
       "03cde60a6323f7122d5178255766e38114b4722ede08f7c9e0c5df9b912cc201d6",
     host: "34.65.85.39:9745",
-    min: 500000,
+    min: 550000,
   },
   {
     title: "Breez",
