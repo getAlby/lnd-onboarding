@@ -74,11 +74,16 @@ function App() {
   const [channelOptions, setChannelOptions] = React.useState<RecommendedNode[]>(
     []
   );
+  const hiddenChannelOptions = React.useMemo(
+    () => RECOMMENDED_NODES.filter((node) => channelOptions.indexOf(node) < 0),
+    [channelOptions]
+  );
+
   const [channelOpenTransactionId, setChannelOpenTransactionId] =
     React.useState<string>();
 
   const MIN_BALANCE = Math.min(...RECOMMENDED_NODES.map((n) => n.min));
-  const findChannel = (amount: number) => {
+  const findConnectableNodes = (amount: number) => {
     return RECOMMENDED_NODES.filter((n) => amount > n.min);
   };
 
@@ -103,9 +108,9 @@ function App() {
           setStepIndex(1);
           const balanceResponse = await fetchBalance();
           const confirmedBalance = parseInt(balanceResponse.confirmed_balance);
-          const channels = findChannel(confirmedBalance);
-          if (channels.length > 0) {
-            setChannelOptions(channels);
+          const nodes = findConnectableNodes(confirmedBalance);
+          if (nodes.length > 0) {
+            setChannelOptions(nodes);
             setStepIndex(2);
           } else {
             const existingAddress = window.localStorage.getItem("address");
@@ -184,8 +189,21 @@ function App() {
     }
   }
 
+  const logos = (
+    <div className="mb-8 flex items-center justify-center gap-4">
+      <img src={albyImage} className="h-16 w-16 rounded" />
+      <p>✗</p>
+      <img src={lndImage} className="h-16 w-16 rounded" />
+    </div>
+  );
+
   if (isLoading) {
-    return <h1 className="mb-4 text-2xl text-center font-bold">Loading...</h1>;
+    return (
+      <div className="flex flex-col justify-start items-center w-full h-full pt-24">
+        {logos}
+        <h1 className="mt-4 text-lg text-center font-bold">Loading...</h1>
+      </div>
+    );
   }
   if (connectError) {
     return (
@@ -206,17 +224,13 @@ function App() {
     >
       <div className="flex w-full max-w-lg flex-col items-center justify-center">
         <h1 className="mb-4 text-2xl font-bold">Setup {alias}</h1>
-        <div className="mb-8 flex items-center justify-center gap-4">
-          <img src={albyImage} className="h-16 w-16 rounded" />
-          <p>✗</p>
-          <img src={lndImage} className="h-16 w-16 rounded" />
-        </div>
-        <div className="mb-8 flex w-full flex-col items-center justify-center rounded-2xl p-4 shadow-lg">
-          <h2 className="mb-8 text-lg font-semibold">
+        {logos}
+        <div className="mb-8 flex w-full flex-col items-start justify-start rounded-2xl p-4 shadow-lg">
+          <h2 className="mt-4 mb-8 text-lg font-semibold text-center w-full">
             {steps[currentStepIndex]}
           </h2>
           {currentStepIndex === 0 && (
-            <>
+            <div className="flex flex-col gap-4">
               <p>This wizard helps you to setup your new LND lightning node!</p>
               <p>
                 In 3 steps it helps you to fund your node and open channels to
@@ -224,14 +238,23 @@ function App() {
               </p>
               <p>
                 Make sure you have the{" "}
-                <a href="https://getalby.com">Alby extension instaled</a> and
-                connected to a LND node.
+                <a href="https://getalby.com" target="_blank" className="link">
+                  Alby extension installed
+                </a>{" "}
+                and connected to a LND node.
               </p>
               <p>
                 To get a voltage cloud node you can{" "}
-                <a href="https://info.getalby.com/voltage">follow our guide</a>.
+                <a
+                  href="https://info.getalby.com/voltage"
+                  target="_blank"
+                  className="link"
+                >
+                  follow our guide
+                </a>
+                .
               </p>
-              <ol className="list-inside list-decimal">
+              <ol className="list-inside list-decimal flex flex-col gap-4 pl-4">
                 <li>Install the Alby extension</li>
                 <li>
                   Get your lightning node. We currently recommend Voltage cloud
@@ -239,10 +262,10 @@ function App() {
                 </li>
                 <li>Connect to your Lightning node from the Alby extension</li>
               </ol>
-              <p className="mt-4 italic">
+              <p className="mt-4 italic text-center w-full">
                 Once the above steps are done, please refresh this page.
               </p>
-            </>
+            </div>
           )}
           {currentStepIndex === 1 && (
             <>
@@ -250,11 +273,11 @@ function App() {
                 You currently have <strong>{balance?.confirmed} sats</strong> on
                 your onchain wallet.
               </p>
-              <p>
+              <p className="mt-4">
                 To open a open a lightning channel we recommend at{" "}
-                <strong>least {MIN_BALANCE} sats</strong>
+                <strong>least {MIN_BALANCE} sats</strong>.
               </p>
-              <p>
+              <p className="mt-4">
                 Please send sats to your node and wait for one confirmation.
               </p>
               <p className="mt-4">Deposit address:</p>
@@ -266,6 +289,10 @@ function App() {
 
               <p>Confirmed balance: {balance?.confirmed} sats</p>
               <p>Unconfirmed balance: {balance?.unconfirmed} sats</p>
+
+              <p className="mt-4 italic text-center w-full">
+                Once completed please refresh this page.
+              </p>
             </>
           )}
           {currentStepIndex === 2 && channelOpenTransactionId && (
@@ -299,6 +326,12 @@ function App() {
                 <p className="mb-4 mt-8 font-semibold">
                   Open a channel with one of our recommended nodes
                 </p>
+                {hiddenChannelOptions.length > 0 && (
+                  <p className="italic text-xs mb-4 w-full text-center">
+                    Deposit more sats to unlock {hiddenChannelOptions.length}{" "}
+                    more nodes
+                  </p>
+                )}
                 <div className="flex flex-col gap-2">
                   {channelOptions.map((node) => (
                     <div
@@ -344,7 +377,7 @@ function App() {
                   >
                     Open Channel
                   </button>
-                  <p>
+                  <p className="mt-4 italic">
                     This will connect your node to the peer and open a new
                     lightning channel with the maximum of your available
                     balance.
