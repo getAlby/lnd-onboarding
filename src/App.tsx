@@ -5,7 +5,7 @@ import lndImage from "./assets/lnd.png";
 import albyImage from "./assets/alby.png";
 import { getTransactionId, hexToBase64 } from "./utils";
 
-const RECOMMENDED_NODES: RecommendedChannel[] = [
+const RECOMMENDED_NODES: RecommendedNode[] = [
   {
     title: "ACINQ",
     pubkey:
@@ -44,13 +44,14 @@ const RECOMMENDED_NODES: RecommendedChannel[] = [
   },
   {
     title: "Voltage.cloud (C2)",
-    pubkey: "02cfdc6b60e5931d174a342b20b50d6a2a17c6e4ef8e077ea54069a3541ad50eb0",
+    pubkey:
+      "02cfdc6b60e5931d174a342b20b50d6a2a17c6e4ef8e077ea54069a3541ad50eb0",
     host: "52.89.237.109:9735",
     min: 300000,
-  }
+  },
 ];
 
-type RecommendedChannel = {
+type RecommendedNode = {
   title: string;
   pubkey: string;
   host: string;
@@ -60,6 +61,7 @@ type RecommendedChannel = {
 const steps = ["Connect Node", "Fund Your Node", "Open Channel"];
 
 function App() {
+  const [connectError, setConnectError] = React.useState("");
   const [currentStepIndex, setStepIndex] = React.useState(0);
   const [isLoading, setLoading] = React.useState(true);
   const [balance, setBalance] = React.useState<
@@ -69,8 +71,9 @@ function App() {
   const [address, setAddress] = React.useState<string>();
   const [connectPubkey, setConnectPubkey] = React.useState<string>();
   const [connectHost, setConnectHost] = React.useState<string>();
-  const [channelOptions, setChannelOptions] =
-    React.useState<RecommendedChannel[]>([]);
+  const [channelOptions, setChannelOptions] = React.useState<RecommendedNode[]>(
+    []
+  );
   const [channelOpenTransactionId, setChannelOpenTransactionId] =
     React.useState<string>();
 
@@ -82,36 +85,46 @@ function App() {
   React.useEffect(() => {
     (async () => {
       async function init() {
-        if (!window.webln?.request) {
-          return;
-        }
-        await window.webln.enable();
-        const info: GetInfoResponse = await window.webln.getInfo();
-        if (
-          info.methods.indexOf("request.walletbalance") < 0 ||
-          info.methods.indexOf("request.newaddress") < 0
-        ) {
-          return;
-        }
-        setAlias(info.node?.alias);
-        setStepIndex(1);
-        const balanceResponse = await fetchBalance();
-        const confirmedBalance = parseInt(balanceResponse.confirmed_balance);
-        const channels = findChannel(confirmedBalance);
-        if (channels.length > 0) {
-          setChannelOptions(channels);
-          setStepIndex(2);
-        } else {
-          const existingAddress = window.localStorage.getItem("address");
-          if (existingAddress) {
-            setAddress(existingAddress);
-          } else {
-            const newaddressResponse = (await window.webln.request(
-              "newaddress",
-            )) as { address: string };
-            setAddress(newaddressResponse.address);
-            window.localStorage.setItem("address", newaddressResponse.address);
+        try {
+          if (!window.webln?.request) {
+            setLoading(false);
+            return;
           }
+          await window.webln.enable();
+          const info: GetInfoResponse = await window.webln.getInfo();
+          if (
+            info.methods.indexOf("request.walletbalance") < 0 ||
+            info.methods.indexOf("request.newaddress") < 0
+          ) {
+            setLoading(false);
+            return;
+          }
+          setAlias(info.node?.alias);
+          setStepIndex(1);
+          const balanceResponse = await fetchBalance();
+          const confirmedBalance = parseInt(balanceResponse.confirmed_balance);
+          const channels = findChannel(confirmedBalance);
+          if (channels.length > 0) {
+            setChannelOptions(channels);
+            setStepIndex(2);
+          } else {
+            const existingAddress = window.localStorage.getItem("address");
+            if (existingAddress) {
+              setAddress(existingAddress);
+            } else {
+              const newaddressResponse = (await window.webln.request(
+                "newaddress"
+              )) as { address: string };
+              setAddress(newaddressResponse.address);
+              window.localStorage.setItem(
+                "address",
+                newaddressResponse.address
+              );
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          setConnectError("Failed to connect to wallet: " + error);
         }
       }
       await init();
@@ -120,6 +133,9 @@ function App() {
   }, []);
 
   async function fetchBalance() {
+    if (!window.webln?.request) {
+      throw new Error("WebLN.request not available");
+    }
     const balanceResponse = (await window.webln.request("walletbalance")) as {
       confirmed_balance: string;
       unconfirmed_balance: string;
@@ -160,7 +176,7 @@ function App() {
       })) as { funding_txid_bytes: string };
       console.log("Open channel response", openChannelResponse);
       setChannelOpenTransactionId(
-        getTransactionId(openChannelResponse.funding_txid_bytes),
+        getTransactionId(openChannelResponse.funding_txid_bytes)
       );
     } catch (error) {
       console.error(error);
@@ -170,6 +186,17 @@ function App() {
 
   if (isLoading) {
     return <h1 className="mb-4 text-2xl text-center font-bold">Loading...</h1>;
+  }
+  if (connectError) {
+    return (
+      <div className="flex flex-col justify-center items-center w-full">
+        <h1 className="mb-4 text-2xl text-center font-bold">
+          Connection Error
+        </h1>
+        <p>{connectError}</p>
+        <p>Please refresh and try again.</p>
+      </div>
+    );
   }
 
   return (
@@ -262,12 +289,12 @@ function App() {
             channelOptions.length > 0 && (
               <>
                 <p>
-                  Great, you have {balance?.confirmed} sats available to open
-                  a new lightning channel.
+                  Great, you have {balance?.confirmed} sats available to open a
+                  new lightning channel.
                 </p>
-                <p>
-                  This channel will allow you to <strong>send</strong>{" "}
-                  ligthning payments.
+                <p className="mt-4">
+                  This channel will allow you to <strong>send</strong> lightning
+                  payments.
                 </p>
                 <p className="mb-4 mt-8 font-semibold">
                   Open a channel with one of our recommended nodes
@@ -319,11 +346,12 @@ function App() {
                   </button>
                   <p>
                     This will connect your node to the peer and open a new
-                    lightning channel with the maximum of your available balance.
+                    lightning channel with the maximum of your available
+                    balance.
                   </p>
                 </div>
-              </>,
-              )}
+              </>
+            )}
         </div>
         <ul className="steps text-xs">
           {steps.map((step, index) => (
