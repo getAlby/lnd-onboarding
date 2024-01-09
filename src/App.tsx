@@ -319,8 +319,8 @@ function App() {
                   new lightning channel.
                 </p>
                 <p className="mt-4">
-                  This channel will allow you to <strong>send</strong> lightning
-                  payments.
+                  This channel will initially allow you to <strong>send</strong>{" "}
+                  lightning payments.
                 </p>
                 <p className="mb-4 mt-8 font-semibold">
                   Open a channel with one of our recommended nodes
