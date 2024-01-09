@@ -39,15 +39,14 @@ const RECOMMENDED_NODES: RecommendedNode[] = [
     pubkey:
       "0324ba2392e25bff76abd0b1f7e4b53b5f82aa53fddc3419b051b6c801db9e2247",
     host: "54.69.203.247:9735",
-    min: 10000,
-    //min: 300000,
+    min: 350000,
   },
   {
     title: "Voltage.cloud (C2)",
     pubkey:
       "02cfdc6b60e5931d174a342b20b50d6a2a17c6e4ef8e077ea54069a3541ad50eb0",
     host: "52.89.237.109:9735",
-    min: 300000,
+    min: 350000,
   },
 ];
 
