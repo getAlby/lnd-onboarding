@@ -100,9 +100,9 @@ function App() {
             info.methods.indexOf("request.walletbalance") < 0 ||
             info.methods.indexOf("request.newaddress") < 0
           ) {
-            const isEnabled = await window.webln.isEnabled();
+            const isEnabled = await window.webln.isEnabled?.();
             if (isEnabled) {
-              window.webln.on("accountChanged", () => {
+              window.webln.on?.("accountChanged", () => {
                 document.location.reload();
               });
             }
