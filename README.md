@@ -2,6 +2,8 @@
 
 This wizard helps you to setup your new LND lightning node by helping you create your first channel and start sending lightning payments.
 
+[Try it here!](https://getalby.github.io/lnd-onboarding/)
+
 ## Development
 
 `yarn install`
