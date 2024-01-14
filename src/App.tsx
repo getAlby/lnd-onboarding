@@ -268,7 +268,7 @@ function App() {
                   </a>{" "}
                   to quickly get a cloud hosted node from Voltage
                 </li>
-                <li>Connect the Alby extension to your Lightning node</li>
+                <li>Connect the Alby extension to your LND Lightning node</li>
               </ol>
               <p className="mt-4 italic text-center w-full">
                 Once the above steps are done, please refresh this page.
