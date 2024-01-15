@@ -337,7 +337,7 @@ function App() {
                 {hiddenChannelOptions.length > 0 && (
                   <p className="italic text-xs mb-4 w-full text-center">
                     {hiddenChannelOptions.length} nodes are hidden because they
-                    a higher minimum channel size than your current onchain
+                    have a higher minimum channel size than your current onchain
                     balance.
                   </p>
                 )}
