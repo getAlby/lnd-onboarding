@@ -236,36 +236,39 @@ function App() {
           </h2>
           {currentStepIndex === 0 && (
             <div className="flex flex-col gap-4">
-              <p>This wizard helps you to setup your new LND lightning node!</p>
               <p>
-                In 3 steps it helps you to fund your node and open channels to
-                send and receive lightning payments.
+                This wizard helps you to setup your new bitcoin lightning node!
               </p>
               <p>
-                Make sure you have the{" "}
-                <a href="https://getalby.com" target="_blank" className="link">
-                  Alby extension installed
-                </a>{" "}
-                and connected to a LND node.
+                In 2 simple steps it guides you to fund your node and open
+                channels to send and receive bitcoin payments over the lightning
+                network.
               </p>
-              <p>
-                To get a voltage cloud node you can{" "}
-                <a
-                  href="https://info.getalby.com/voltage"
-                  target="_blank"
-                  className="link"
-                >
-                  follow our guide
-                </a>
-                .
-              </p>
+              <p>But first, make sure to:</p>
+
               <ol className="list-inside list-decimal flex flex-col gap-4 pl-4">
-                <li>Install the Alby extension</li>
                 <li>
-                  Get your lightning node. We currently recommend Voltage cloud
-                  to quickly get a cloud hosted node
+                  Install the{" "}
+                  <a
+                    href="https://getalby.com"
+                    target="_blank"
+                    className="link"
+                  >
+                    Alby extension
+                  </a>
                 </li>
-                <li>Connect to your Lightning node from the Alby extension</li>
+                <li>
+                  Start your lightning node.{" "}
+                  <a
+                    href="https://info.getalby.com/voltage"
+                    target="_blank"
+                    className="link"
+                  >
+                    Follow our guide
+                  </a>{" "}
+                  to quickly get a cloud hosted node from Voltage
+                </li>
+                <li>Connect the Alby extension to your LND Lightning node</li>
               </ol>
               <p className="mt-4 italic text-center w-full">
                 Once the above steps are done, please refresh this page.
@@ -279,7 +282,7 @@ function App() {
                 your onchain wallet.
               </p>
               <p className="mt-4">
-                To open a open a lightning channel we recommend at{" "}
+                To open a lightning channel we recommend at{" "}
                 <strong>least {MIN_BALANCE} sats</strong>.
               </p>
               <p className="mt-4">
@@ -333,8 +336,7 @@ function App() {
                 </p>
                 {hiddenChannelOptions.length > 0 && (
                   <p className="italic text-xs mb-4 w-full text-center">
-                    Deposit more sats to unlock {hiddenChannelOptions.length}{" "}
-                    more nodes
+                    Increase your onchain balance to see more recommended nodes.
                   </p>
                 )}
                 <div className="flex flex-col gap-2">
@@ -384,7 +386,8 @@ function App() {
                   </button>
                   <p className="mt-4 italic">
                     This will connect your node to the peer and open a new
-                    lightning channel with the maximum of your available
+                    lightning channel with the{" "}
+                    <span className="font-bold">maximum</span> of your available
                     balance.
                   </p>
                 </div>
