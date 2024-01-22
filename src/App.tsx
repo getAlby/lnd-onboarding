@@ -336,9 +336,7 @@ function App() {
                 </p>
                 {hiddenChannelOptions.length > 0 && (
                   <p className="italic text-xs mb-4 w-full text-center">
-                    {hiddenChannelOptions.length} nodes are hidden because they
-                    have a higher minimum channel size than your current onchain
-                    balance.
+                    Increase your onchain balance to see more recommended nodes.
                   </p>
                 )}
                 <div className="flex flex-col gap-2">
